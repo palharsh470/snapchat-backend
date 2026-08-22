@@ -11,15 +11,17 @@ from .serializers import (
     ChatSerailizer,
     MessageSerializer
 )
+from .pagination import SpotlightPagination
+from stories.models import Story
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
-from .models import FriendRequest, Profile, Story, Spotlight, Like, Chat
+from .models import FriendRequest, Profile, Spotlight, Like, Chat
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.views import APIView
-from .utils import get_friends, get_friends_28days_count, pending_friends, broadcast_message
+from .utils import get_friends, get_friends_28days_count, broadcast_message
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.models import User
@@ -198,40 +200,18 @@ class ProfileView(APIView):
         )
 
 
-class StoriesView(GenericAPIView):
-    serializer_class = StorySerializer
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        users = User.objects.filter(
-            Q(stories__isnull=False)
-            & Q(stories__created_at__gte=timezone.now() - timedelta(hours=24))
-        ).distinct()
-        serializer = UserSerializer(users, many=True, context={"request": request})
-        return Response(
-            {"status": True, "data": serializer.data}, status=status.HTTP_200_OK
-        )
-
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
-        return Response(
-            {"status": True, "message": "Story Added Successfully"},
-            status=status.HTTP_201_CREATED,
-        )
 
 
 class SpotlightView(GenericAPIView):
     serializer_class = SpotlightSerializer
     permission_classes = [IsAuthenticated]
-
+    pagination_class = SpotlightPagination
+    
     def get(self, request):
-        spotlight = Spotlight.objects.all()
-        serializer = self.get_serializer(spotlight, many=True)
-        return Response(
-            {"status": True, "data": serializer.data}, status=status.HTTP_200_OK
-        )
+        spotlight = Spotlight.objects.all().order_by("-id")
+        page = self.paginate_queryset(spotlight)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)

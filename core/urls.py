@@ -8,7 +8,6 @@ urlpatterns = [
     path("users/", views.UsersView.as_view(), name="users"),
     path("profile/<int:id>/", views.ProfileView.as_view(), name="profile"),
     path("profile/edit/", views.ProfileEditView.as_view(), name="profile-edit"),
-    path("stories/", views.StoriesView.as_view(), name="stories"),
     path("spotlight/", views.SpotlightView.as_view(), name="spotlight"),
     path("request/pending/", views.PendingRequestView.as_view(), name="pending-request"),
     path("spotlight/like/<int:id>/", views.LikeSpotlightView.as_view(), name="like-spotlight"),

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',
     "channels",
     'core',
+    'stories',
     "rest_framework_simplejwt.token_blacklist",
 ]
 
@@ -99,12 +100,7 @@ DATABASES = {
 ALLOWED_HOSTS = [
     "10.116.8.5",
     "localhost",
-    "127.0.0.1",
-    "10.24.227.5",
-    "10.134.231.5",
-    "10.196.107.5",
-    "10.78.88.5",
-    "10.247.180.5",
+    "10.111.7.5",
 ]
 
 # Password validation

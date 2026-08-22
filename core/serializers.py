@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import FriendRequest, Profile, Story, Spotlight, Like, Chat, Messages
+from .models import FriendRequest, Profile, Spotlight, Chat, Messages
 from django.db.models import Q
 from .utils import are_friends
+from django.utils import timezone
+from datetime import timedelta
+from stories.serializers import StorySerializer
 
 
 class UserEditSerializer(serializers.ModelSerializer):
@@ -27,15 +30,7 @@ class ProfileEditSerializer(serializers.ModelSerializer):
             "longitude",
             "latitude",
         ]
-
-
-
-
-
-class StorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Story
-        fields = ["id", "attachment", "created_at"]
+    
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -136,7 +131,7 @@ class SpotlightUserSerializer(serializers.ModelSerializer):
 class SpotlightSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField()
     isLiked = serializers.SerializerMethodField()
-    user = SpotlightUserSerializer()
+    user = SpotlightUserSerializer(read_only = True)
     class Meta:
         model = Spotlight
         fields = [
@@ -148,7 +143,7 @@ class SpotlightSerializer(serializers.ModelSerializer):
             "isLiked",
             "created_at"
         ]
-
+        
     def get_likes(self, obj):
         return obj.spotlight_likes.count()
 
@@ -198,8 +193,17 @@ class MessageSerializer(serializers.ModelSerializer):
 class ChatSerailizer(serializers.ModelSerializer):
     user1 = ChatUserSerializer()
     user2 = ChatUserSerializer()
-    messages = MessageSerializer(many=True)
+    messages = serializers.SerializerMethodField()
     class Meta :
         model = Chat
         fields = [ "id", "user1", "user2", "mode", "streak", "viewed_at", "expires_at", "last_message", "isviewed" , "messages" ]
 
+
+    def get_messages(self, obj):
+        messages = obj.messages.all().order_by("-created_at")
+
+        return MessageSerializer(
+            messages,
+            many=True,
+            context=self.context
+        ).data
