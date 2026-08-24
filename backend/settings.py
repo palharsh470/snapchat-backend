@@ -100,7 +100,7 @@ DATABASES = {
 ALLOWED_HOSTS = [
     "10.116.8.5",
     "localhost",
-    "10.111.7.5",
+    "10.158.238.5",
 ]
 
 # Password validation

@@ -11,7 +11,7 @@ def broadcast_message(msg):
     snap_url = ""
 
     if msg.snap:
-        snap_url = f"http://10.111.7.5:8000{msg.snap.url}"
+        snap_url = f"http://10.158.238.5:8000{msg.snap.url}"
     async_to_sync(channel_layer.group_send)(
         f"chat_{msg.chat.id}",
         {

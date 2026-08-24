@@ -286,11 +286,49 @@ class ChatDetailsView(GenericAPIView):
             if chatRoom.mode == "after_24_hr":
                 chatRoom.expires_at = timezone.now() + timedelta(hours=24)
 
+            chatRoom.save()
+
         serializer = self.get_serializer(chatRoom)
         
         return Response(
             {"status": True,   "data": serializer.data},
             status=status.HTTP_200_OK,
+        )
+
+    def patch(self, request, id):
+        friend = get_object_or_404(User, pk=id)
+
+        chatRoom = Chat.objects.filter(
+            Q(user1=request.user, user2=friend) |
+            Q(user1=friend, user2=request.user)
+        ).first()
+
+        if not chatRoom:
+            return Response(
+                 { "status" : False,
+                    "message": "Chat room not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = self.get_serializer(
+            chatRoom,
+            data=request.data,
+            partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "status" : True,
+                "data" : serializer.data
+            }, status=status.HTTP_206_PARTIAL_CONTENT)
+
+        return Response(
+            {
+                "status" : False,
+                "message" : serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
         )
 
 class MessageView(GenericAPIView):
