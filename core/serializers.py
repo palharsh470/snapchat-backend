@@ -27,8 +27,6 @@ class ProfileEditSerializer(serializers.ModelSerializer):
             "private",
             "image",
             "avatar",
-            "longitude",
-            "latitude",
         ]
     
 
@@ -41,8 +39,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             "avatar",
             "dob",
             "mobile",
-            "longitude",
-            "latitude",
             "private",
         ]
 
@@ -50,6 +46,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     friend_request_status = serializers.SerializerMethodField()
     friend_request_id = serializers.SerializerMethodField()
+    last_message = serializers.SerializerMethodField()
     profile = ProfileSerializer()
     stories = StorySerializer(many=True)
     class Meta:
@@ -62,9 +59,26 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "stories",
+            "last_message",
             "friend_request_status",
             "friend_request_id",
         ]
+
+    def get_last_message(self, obj):
+        current_user = self.context["request"].user
+        message = Messages.objects.filter(Q(sender=obj, receiver=current_user) | Q(sender=current_user, receiver=obj)).order_by("created_at").last()
+        if not message:
+            return None
+        if message.snap :  
+            return {
+                "snap": "snap",
+                "timestamp": message.created_at,
+            }
+        else :
+            return {
+                "text": message.text,
+                "timestamp": message.created_at,
+            }
 
     def get_friend_request_id(self, obj):
         current_user = self.context["request"].user
@@ -101,6 +115,25 @@ class UserSerializer(serializers.ModelSerializer):
             return "friends"
 
         return "accept_request"
+
+class ProfileImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile  
+        fields = ["image"]
+
+
+class UserFriendSerializer(serializers.ModelSerializer):
+    profile = ProfileImageSerializer()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "profile",
+            "first_name",
+            "last_name",
+        ]
 
 class SpotlightProfileSerializer(serializers.ModelSerializer):
     class Meta:

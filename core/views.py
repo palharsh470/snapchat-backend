@@ -9,7 +9,8 @@ from .serializers import (
     StorySerializer,
     UserEditSerializer,
     ChatSerailizer,
-    MessageSerializer
+    MessageSerializer,
+    UserFriendSerializer
 )
 from .pagination import SpotlightPagination
 from stories.models import Story
@@ -114,6 +115,7 @@ class UsersView(GenericAPIView):
         )
 
 
+
 class ProfileEditView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -173,6 +175,9 @@ class ProfileView(APIView):
         user_serializer = UserSerializer(
             profile_info.user, context={"request": request}
         )
+        friends_serializer = UserFriendSerializer(
+            friends, context={"request": request}, many=True
+        )
 
         story_serializer = StorySerializer(
             user_story, many=True, context={"request": request}
@@ -191,6 +196,7 @@ class ProfileView(APIView):
                     "stories": story_serializer.data,
                     "spotlights": spotlight_serializer.data,
                     "friendsCount": friends_count,
+                    "friends" : friends_serializer.data,
                     "friendsCount28days": get_friends_28days_count(profile_info.user),
                     "storyCount28days": story_count_28days,
                     "spotlightCount28days": spotlight_count_28days,

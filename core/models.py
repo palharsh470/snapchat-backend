@@ -9,8 +9,6 @@ class Profile(models.Model):
     private = models.BooleanField(default=False)
     image = models.ImageField(upload_to="profile_image", default="avatar/default-avatar.jpg", blank=True, null=True)
     avatar = models.ImageField(upload_to="avatar",default="avatar/default-avatar.jpg", blank=True, null=True)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} 's profile"
