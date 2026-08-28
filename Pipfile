@@ -4,7 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+django = "*"
 channels = "*"
+daphne = "*"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+pillow = "*"
 
 [dev-packages]
 

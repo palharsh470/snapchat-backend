@@ -19,13 +19,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x+c33dqfkb$-cjaa*j)d&1q!y%jh*@g2+rxn#o+k0^s+4jgb-%'
+import os
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-x+c33dqfkb$...')
+DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 CHANNEL_LAYERS = {
     "default": {
@@ -98,12 +100,6 @@ DATABASES = {
     }
 }
 
-ALLOWED_HOSTS = [
-    "10.116.8.5",
-    "localhost",
-    "127.0.0.1",
-    "10.95.161.5",
-]
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
