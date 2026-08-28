@@ -101,6 +101,7 @@ DATABASES = {
 ALLOWED_HOSTS = [
     "10.116.8.5",
     "localhost",
+    "127.0.0.1",
     "10.95.161.5",
 ]
 
