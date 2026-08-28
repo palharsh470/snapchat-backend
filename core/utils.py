@@ -1,3 +1,4 @@
+from django.conf import settings
 from .models import FriendRequest
 from django.db.models import Q
 from django.utils import timezone
@@ -11,7 +12,8 @@ def broadcast_message(msg):
     snap_url = ""
 
     if msg.snap:
-        snap_url = f"http://10.95.161.5:8000{msg.snap.url}"
+        snap_url = f"{settings.BACKEND_BASE_URL}{msg.snap.url}"
+
     async_to_sync(channel_layer.group_send)(
         f"chat_{msg.chat.id}",
         {
@@ -24,17 +26,6 @@ def broadcast_message(msg):
             "is_system": msg.is_system,
         },
     )
-
-def chat_message(self, event):
-        self.send(text_data=json.dumps({
-            "id": event["id"],
-            "text": event["text"],
-            "snap": event["snap"],
-            "sender": event["sender"],
-            "created_at": event["created_at"],
-            "is_system": event["is_system"],
-        }))
-
 def get_friends(user):
     unique_friends = set()
     queryset = FriendRequest.objects.filter(
