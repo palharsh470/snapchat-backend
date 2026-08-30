@@ -207,7 +207,7 @@ class ChatUserSerializer(serializers.ModelSerializer):
             "profile",
         ]
 class MessageSerializer(serializers.ModelSerializer):
-    
+    snap = serializers.SerializerMethodField()
     class Meta:
         model = Messages
         fields = [
