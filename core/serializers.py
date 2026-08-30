@@ -31,6 +31,8 @@ class ProfileEditSerializer(serializers.ModelSerializer):
     
 
 class ProfileSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    avatar = serializers.SerializerMethodField()
     class Meta:
         model = Profile
         fields = [
@@ -41,6 +43,15 @@ class ProfileSerializer(serializers.ModelSerializer):
             "mobile",
             "private",
         ]
+
+    def get_image(self, obj):
+        if obj.snap:
+            return f"{settings.BACKEND_BASE_URL}{obj.image.url}"
+        return None
+    def get_avatar(self, obj):
+        if obj.snap:
+            return f"{settings.BACKEND_BASE_URL}{obj.avatar.url}"
+        return None
 
 
 class UserSerializer(serializers.ModelSerializer):
