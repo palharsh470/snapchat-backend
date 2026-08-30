@@ -13,7 +13,7 @@ def broadcast_message(msg):
 
     if msg.snap:
         snap_url = f"{settings.BACKEND_BASE_URL}{msg.snap.url}"
-
+        print("SNAP URL:", snap_url)  # temporary debug line
     async_to_sync(channel_layer.group_send)(
         f"chat_{msg.chat.id}",
         {
