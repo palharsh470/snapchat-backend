@@ -1,13 +1,21 @@
 from rest_framework import serializers
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings
 from .models import Story
 from django.contrib.auth.models import User
 
 class StorySerializer(serializers.ModelSerializer):
+    attachment = serializers.SerializerMethodField()
+
     class Meta:
         model = Story
         fields = ["id", "attachment", "created_at"]
+
+    def get_attachment(self, obj):
+        if obj.attachment:
+            return f"{settings.BACKEND_BASE_URL}{obj.attachment.url}"
+        return None
 
 class StoryUserSerializer(serializers.ModelSerializer):
     profile = serializers.SerializerMethodField()
@@ -35,4 +43,3 @@ class StoryUserSerializer(serializers.ModelSerializer):
             obj.profile,
             context=self.context
         ).data
-         

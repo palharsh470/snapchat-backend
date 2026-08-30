@@ -128,9 +128,17 @@ class UserSerializer(serializers.ModelSerializer):
         return "accept_request"
 
 class ProfileImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Profile  
         fields = ["image"]
+
+    def get_image(self, obj):
+        if obj.image:
+            return f"{settings.BACKEND_BASE_URL}{obj.image.url}"
+        return None
+
 
 
 class UserFriendSerializer(serializers.ModelSerializer):
@@ -147,12 +155,18 @@ class UserFriendSerializer(serializers.ModelSerializer):
         ]
 
 class SpotlightProfileSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Profile
         fields = [
             "image",
         ]
 
+    def get_image(self, obj):
+        if obj.image:
+            return f"{settings.BACKEND_BASE_URL}{obj.image.url}"
+        return None
 
 class SpotlightUserSerializer(serializers.ModelSerializer):
     profile = SpotlightProfileSerializer()
@@ -175,6 +189,7 @@ class SpotlightUserSerializer(serializers.ModelSerializer):
 class SpotlightSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField()
     isLiked = serializers.SerializerMethodField()
+    upload = serializers.SerializerMethodField()
     user = SpotlightUserSerializer(read_only = True)
     class Meta:
         model = Spotlight
@@ -188,6 +203,11 @@ class SpotlightSerializer(serializers.ModelSerializer):
             "created_at"
         ]
         
+    def get_upload(self, obj):
+        if obj.upload:
+            return f"{settings.BACKEND_BASE_URL}{obj.upload.url}"
+        return None
+
     def get_likes(self, obj):
         return obj.spotlight_likes.count()
 
@@ -200,7 +220,6 @@ class SpotlightSerializer(serializers.ModelSerializer):
         return obj.spotlight_likes.filter(
             user=request.user
         ).exists()
-
 
 class FriendRequestSerializer(serializers.ModelSerializer):
     from_user = UserSerializer()
@@ -217,6 +236,7 @@ class ChatUserSerializer(serializers.ModelSerializer):
             "username",
             "profile",
         ]
+
 class MessageSerializer(serializers.ModelSerializer):
     snap = serializers.SerializerMethodField()
     class Meta:
