@@ -6,7 +6,7 @@ from .utils import are_friends
 from django.utils import timezone
 from datetime import timedelta
 from stories.serializers import StorySerializer
-
+from backend import settings
 
 class UserEditSerializer(serializers.ModelSerializer):
 
@@ -221,6 +221,11 @@ class MessageSerializer(serializers.ModelSerializer):
             "is_system",
         ]
         read_only_fields = ["chat"]
+
+    def get_snap(self, obj):
+        if obj.snap:
+            return f"{settings.BACKEND_BASE_URL}{obj.snap.url}"
+        return None
         
  
 class ChatSerailizer(serializers.ModelSerializer):
