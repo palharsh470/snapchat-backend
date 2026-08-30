@@ -45,11 +45,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         ]
 
     def get_image(self, obj):
-        if obj.snap:
+        if obj.image:
             return f"{settings.BACKEND_BASE_URL}{obj.image.url}"
         return None
     def get_avatar(self, obj):
-        if obj.snap:
+        if obj.avatar:
             return f"{settings.BACKEND_BASE_URL}{obj.avatar.url}"
         return None
 
