@@ -5,17 +5,20 @@ from django.conf import settings
 from .models import Story
 from django.contrib.auth.models import User
 
-class StorySerializer(serializers.ModelSerializer):
-    attachment = serializers.SerializerMethodField()
+from django.conf import settings
 
+class StorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Story
         fields = ["id", "attachment", "created_at"]
 
-    def get_attachment(self, obj):
-        if obj.attachment:
-            return f"{settings.BACKEND_BASE_URL}{obj.attachment.url}"
-        return None
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.attachment:
+            rep["attachment"] = f"{settings.BACKEND_BASE_URL}{instance.attachment.url}"
+        else:
+            rep["attachment"] = None
+        return rep
 
 class StoryUserSerializer(serializers.ModelSerializer):
     profile = serializers.SerializerMethodField()

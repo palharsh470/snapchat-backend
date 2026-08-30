@@ -31,8 +31,6 @@ class ProfileEditSerializer(serializers.ModelSerializer):
     
 
 class ProfileSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-    avatar = serializers.SerializerMethodField()
     class Meta:
         model = Profile
         fields = [
@@ -44,14 +42,11 @@ class ProfileSerializer(serializers.ModelSerializer):
             "private",
         ]
 
-    def get_image(self, obj):
-        if obj.image:
-            return f"{settings.BACKEND_BASE_URL}{obj.image.url}"
-        return None
-    def get_avatar(self, obj):
-        if obj.avatar:
-            return f"{settings.BACKEND_BASE_URL}{obj.avatar.url}"
-        return None
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["image"] = f"{settings.BACKEND_BASE_URL}{instance.image.url}" if instance.image else None
+        rep["avatar"] = f"{settings.BACKEND_BASE_URL}{instance.avatar.url}" if instance.avatar else None
+        return rep
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -189,7 +184,6 @@ class SpotlightUserSerializer(serializers.ModelSerializer):
 class SpotlightSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField()
     isLiked = serializers.SerializerMethodField()
-    upload = serializers.SerializerMethodField()
     user = SpotlightUserSerializer(read_only = True)
     class Meta:
         model = Spotlight
@@ -202,11 +196,11 @@ class SpotlightSerializer(serializers.ModelSerializer):
             "isLiked",
             "created_at"
         ]
-        
-    def get_upload(self, obj):
-        if obj.upload:
-            return f"{settings.BACKEND_BASE_URL}{obj.upload.url}"
-        return None
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["upload"] = f"{settings.BACKEND_BASE_URL}{instance.upload.url}" if instance.upload else None
+        return rep
 
     def get_likes(self, obj):
         return obj.spotlight_likes.count()
@@ -238,7 +232,6 @@ class ChatUserSerializer(serializers.ModelSerializer):
         ]
 
 class MessageSerializer(serializers.ModelSerializer):
-    snap = serializers.SerializerMethodField()
     class Meta:
         model = Messages
         fields = [
@@ -253,10 +246,10 @@ class MessageSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["chat"]
 
-    def get_snap(self, obj):
-        if obj.snap:
-            return f"{settings.BACKEND_BASE_URL}{obj.snap.url}"
-        return None
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["snap"] = f"{settings.BACKEND_BASE_URL}{instance.snap.url}" if instance.snap else None
+        return rep
         
  
 class ChatSerailizer(serializers.ModelSerializer):
