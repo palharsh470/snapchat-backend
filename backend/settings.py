@@ -46,6 +46,10 @@ REST_FRAMEWORK = {
     ),
 }
 
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{RENDER_EXTERNAL_HOSTNAME}",
+] if RENDER_EXTERNAL_HOSTNAME else []
+
 INSTALLED_APPS = [
     "daphne",
     'django.contrib.admin',
