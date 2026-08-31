@@ -12,6 +12,7 @@ def broadcast_message(msg):
 
     if msg.snap:
         snap_url = f"{settings.BACKEND_BASE_URL}{msg.snap.url}"
+
     async_to_sync(channel_layer.group_send)(
         f"chat_{msg.chat.id}",
         {
@@ -20,10 +21,11 @@ def broadcast_message(msg):
             "text": msg.text,
             "snap": snap_url,
             "sender": msg.sender.id,
-            "created_at": msg.created_at.strftime("%H:%M"),
+            "created_at": msg.created_at.isoformat(),
             "is_system": msg.is_system,
         },
     )
+    
 def get_friends(user):
     unique_friends = set()
     queryset = FriendRequest.objects.filter(
